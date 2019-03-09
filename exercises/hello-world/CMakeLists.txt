@@ -1,5 +1,5 @@
-# Set the minimum version required by the FetchContent module
-cmake_minimum_required(VERSION 3.11)
+# Set the minimum version required for ASM_NASM support in VS 2010 and above
+cmake_minimum_required(VERSION 3.9)
 
 # Get the exercise name from the current directory
 get_filename_component(exercise ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -13,30 +13,15 @@ else()
   set(CMAKE_ASM_NASM_OBJECT_FORMAT elf)
 endif()
 
-project(${exercise} C ASM_NASM)
-
-include(FetchContent)
-FetchContent_Declare(
-  unity
-  GIT_REPOSITORY https://github.com/ThrowTheSwitch/Unity.git
-  GIT_TAG v2.4.3
-)
-
-FetchContent_GetProperties(unity)
-if(NOT unity_POPULATED)
-  FetchContent_Populate(unity)
-endif()
+project(${exercise} CXX ASM_NASM)
 
 # Get a source filename from the exercise name by replacing -'s with _'s
 string(REPLACE "-" "_" file ${exercise})
 
 add_executable(${exercise}
   ${file}.asm
-  ${file}_test.c
-  ${unity_SOURCE_DIR}/src/unity.c
+  ${file}_test.cpp
 )
-
-target_include_directories(${exercise} PRIVATE ${unity_SOURCE_DIR}/src)
 
 target_compile_options(${exercise} PRIVATE
   $<$<COMPILE_LANGUAGE:ASM_NASM>:-g>
@@ -57,20 +42,20 @@ else()
 endif()
 
 set_target_properties(${exercise} PROPERTIES
-  C_STANDARD 99
-  C_STANDARD_REQUIRED OFF
-  C_EXTENSIONS OFF
+  CXX_STANDARD 11
+  CXX_STANDARD_REQUIRED ON
+  CXX_EXTENSIONS OFF
 )
 
-if("${CMAKE_C_COMPILER_ID}" MATCHES "(GNU|Clang)")
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(GNU|Clang)")
   target_compile_options(${exercise} PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-g>
-    $<$<COMPILE_LANGUAGE:C>:-Wall>
-    $<$<COMPILE_LANGUAGE:C>:-Wextra>
-    $<$<COMPILE_LANGUAGE:C>:-pedantic>
-    $<$<COMPILE_LANGUAGE:C>:-Werror>
+    $<$<COMPILE_LANGUAGE:CXX>:-g>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+    $<$<COMPILE_LANGUAGE:CXX>:-pedantic>
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror>
     # Generate code for 32-bit ABI
-    $<$<COMPILE_LANGUAGE:C>:-m32>
+    $<$<COMPILE_LANGUAGE:CXX>:-m32>
   )
   set_target_properties(${exercise} PROPERTIES LINK_FLAGS -m32)
 endif()
