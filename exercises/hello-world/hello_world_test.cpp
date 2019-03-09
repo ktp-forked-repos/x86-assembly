@@ -1,8 +1,7 @@
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 extern "C" const char *hello();
 
-TEST_CASE("Say Hi!") {
+TEST_CASE("Say Hi!", "[integration]") {
     CHECK_THAT(hello(), Catch::Equals("Hello, World!"));
 }

@@ -19,6 +19,7 @@ project(${exercise} CXX ASM_NASM)
 string(REPLACE "-" "_" file ${exercise})
 
 add_executable(${exercise}
+  main.cpp
   ${file}.asm
   ${file}_test.cpp
 )
