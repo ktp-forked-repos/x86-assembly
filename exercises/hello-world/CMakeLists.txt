@@ -1,5 +1,10 @@
-# Set the minimum version required for ASM_NASM support in VS 2010 and above
-cmake_minimum_required(VERSION 3.9)
+if(WIN32)
+  # ASM_NASM support for VS 2010 and above was introduced in version 3.9
+  cmake_minimum_required(VERSION 3.9)
+else()
+  # The COMPILE_LANGUAGE generator expression was introduced in version 3.3
+  cmake_minimum_required(VERSION 3.3)
+endif()
 
 # Get the exercise name from the current directory
 get_filename_component(exercise ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -18,14 +23,9 @@ project(${exercise} CXX ASM_NASM)
 # Get a source filename from the exercise name by replacing -'s with _'s
 string(REPLACE "-" "_" file ${exercise})
 
-add_executable(${exercise}
-  main.cpp
-  ${file}.asm
-  ${file}_test.cpp
-)
+add_executable(${exercise} main.cpp ${file}.asm ${file}_test.cpp)
 
 target_compile_options(${exercise} PRIVATE
-  $<$<COMPILE_LANGUAGE:ASM_NASM>:-g>
   $<$<COMPILE_LANGUAGE:ASM_NASM>:-Werror>
 )
 
@@ -42,15 +42,14 @@ else()
   )
 endif()
 
+# C++11 is required by Catch2
 set_target_properties(${exercise} PROPERTIES
   CXX_STANDARD 11
   CXX_STANDARD_REQUIRED ON
-  CXX_EXTENSIONS OFF
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(GNU|Clang)")
   target_compile_options(${exercise} PRIVATE
-    $<$<COMPILE_LANGUAGE:CXX>:-g>
     $<$<COMPILE_LANGUAGE:CXX>:-Wall>
     $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
     $<$<COMPILE_LANGUAGE:CXX>:-pedantic>
