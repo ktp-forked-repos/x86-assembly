@@ -26,13 +26,14 @@ string(REPLACE "-" "_" file ${exercise})
 add_executable(${exercise} main.cpp ${file}.asm ${file}_test.cpp)
 
 target_compile_options(${exercise} PRIVATE
+  $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:ASM_NASM>>:-g>
   $<$<COMPILE_LANGUAGE:ASM_NASM>:-Werror>
 )
 
 if("${CMAKE_ASM_NASM_OBJECT_FORMAT}" STREQUAL "elf")
   # Use DWARF debug information format
   target_compile_options(${exercise} PRIVATE
-    $<$<COMPILE_LANGUAGE:ASM_NASM>:-F dwarf>
+    $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:ASM_NASM>>:-F dwarf>
   )
 else()
   # Prepend underscore to all global and external variables, as C requires it.
@@ -46,6 +47,7 @@ endif()
 set_target_properties(${exercise} PROPERTIES
   CXX_STANDARD 11
   CXX_STANDARD_REQUIRED ON
+  CXX_EXTENSIONS OFF
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(GNU|Clang)")
