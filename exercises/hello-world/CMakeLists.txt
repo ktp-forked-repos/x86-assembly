@@ -18,12 +18,12 @@ else()
   set(CMAKE_ASM_NASM_OBJECT_FORMAT elf)
 endif()
 
-project(${exercise} CXX ASM_NASM)
+project(${exercise} C ASM_NASM)
 
 # Get a source filename from the exercise name by replacing -'s with _'s
 string(REPLACE "-" "_" file ${exercise})
 
-add_executable(${exercise} main.cpp ${file}.asm ${file}_test.cpp)
+add_executable(${exercise} ${file}.asm ${file}_test.c unity/unity.c)
 
 target_compile_options(${exercise} PRIVATE
   $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:ASM_NASM>>:-g>
@@ -43,21 +43,20 @@ else()
   )
 endif()
 
-# C++11 is required by Catch2
 set_target_properties(${exercise} PROPERTIES
-  CXX_STANDARD 11
-  CXX_STANDARD_REQUIRED ON
-  CXX_EXTENSIONS OFF
+  C_STANDARD 99
+  C_STANDARD_REQUIRED OFF
+  C_EXTENSIONS OFF
 )
 
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(GNU|Clang)")
+if("${CMAKE_C_COMPILER_ID}" MATCHES "(GNU|Clang)")
   target_compile_options(${exercise} PRIVATE
-    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
-    $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
-    $<$<COMPILE_LANGUAGE:CXX>:-pedantic>
-    $<$<COMPILE_LANGUAGE:CXX>:-Werror>
+    $<$<COMPILE_LANGUAGE:C>:-Wall>
+    $<$<COMPILE_LANGUAGE:C>:-Wextra>
+    $<$<COMPILE_LANGUAGE:C>:-pedantic>
+    $<$<COMPILE_LANGUAGE:C>:-Werror>
     # Generate code for 32-bit ABI
-    $<$<COMPILE_LANGUAGE:CXX>:-m32>
+    $<$<COMPILE_LANGUAGE:C>:-m32>
   )
   set_target_properties(${exercise} PROPERTIES LINK_FLAGS -m32)
 endif()
