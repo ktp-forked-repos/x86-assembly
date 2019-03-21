@@ -30,16 +30,16 @@ target_compile_options(${exercise} PRIVATE
   $<$<COMPILE_LANGUAGE:ASM_NASM>:-Werror>
 )
 
-if("${CMAKE_ASM_NASM_OBJECT_FORMAT}" STREQUAL "elf")
-  # Use DWARF debug information format
-  target_compile_options(${exercise} PRIVATE
-    $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:ASM_NASM>>:-F dwarf>
-  )
-else()
+if(WIN32 OR APPLE)
   # Prepend underscore to all global and external variables, as C requires it.
   # For ELF, though, the leading underscore should not be used.
   target_compile_options(${exercise} PRIVATE
     $<$<COMPILE_LANGUAGE:ASM_NASM>:--gprefix _>
+  )
+else()
+  # Use DWARF debug information format
+  target_compile_options(${exercise} PRIVATE
+    $<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:ASM_NASM>>:-F dwarf>
   )
 endif()
 
